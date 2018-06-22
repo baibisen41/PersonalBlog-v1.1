@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/CommonDao/CommonDao.iml" filepath="$PROJECT_DIR$/CommonDao/CommonDao.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MyBlog/MyBlog.iml" filepath="$PROJECT_DIR$/MyBlog/MyBlog.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PersonalBlog.iml" filepath="$PROJECT_DIR$/PersonalBlog.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SourceMall/SourceMall.iml" filepath="$PROJECT_DIR$/SourceMall/SourceMall.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SpiderTask/SpiderTask.iml" filepath="$PROJECT_DIR$/SpiderTask/SpiderTask.iml" />
+    </modules>
+  </component>
+</project>

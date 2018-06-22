@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bbs.dao.PbNewsDao">
+
+    <insert id="saveNewsList" parameterType="java.util.List">
+        INSERT INTO pb_news(
+        id,
+        title,
+        tag,
+        thumb_pic,
+        summary,
+        content,
+        create_date
+        ) VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.title},
+            #{item.tag},
+            #{item.thumbPic},
+            #{item.summary},
+            #{item.content},
+            #{item.createDate}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="saveInitPvList" parameterType="java.util.List">
+        INSERT INTO pb_news_pv(
+        id,
+        create_date
+        ) VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.createDate}
+            )
+        </foreach>
+    </insert>
+
+    <select id="listNewsListByDate" parameterType="java.util.Map" resultType="com.bbs.entity.News">
+        SELECT
+        pb.id AS id,
+        pb.title AS title,
+        pb.tag AS tag,
+        pb.thumb_pic AS thumbPic,
+        pb.summary AS summary,
+        pb.content AS content,
+        pb.create_date AS createDate
+        FROM
+        pb_news pb
+        WHERE
+        DATE_FORMAT(pb.create_date,'%Y-%m-%d') = DATE_FORMAT(#{date},'%Y-%m-%d')
+        ORDER BY
+        pb.create_date DESC
+        LIMIT #{pageNum},20
+    </select>
+
+    <select id="selectNewsById" parameterType="String" resultType="com.bbs.entity.News">
+        SELECT
+        p.id AS id,
+        p.title AS title,
+        p.create_date AS createDate,
+        p.content AS content,
+        p.tag AS tag,
+	    pv.news_pv AS blogPv
+        FROM
+        pb_news p
+        RIGHT JOIN pb_news_pv pv ON pv.id = p.id
+        WHERE
+        p.id = #{id}
+    </select>
+
+    <select id="countNewsList" resultType="Integer">
+        SELECT
+            COUNT(0)
+        FROM
+            pb_news pn
+        WHERE
+            DATE_FORMAT(pn.create_date, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d')
+    </select>
+</mapper>

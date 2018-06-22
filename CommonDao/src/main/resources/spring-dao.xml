@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <context:component-scan base-package="com.bbs" />
+
+    <bean id="mysqlDataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <property name="url" value="${jdbc_url}"/>
+        <property name="username" value="${jdbc_username}"/>
+        <property name="password" value="${jdbc_password}"/>
+        <!-- 配置初始化大小、最小、最大 -->
+        <property name="initialSize" value="4"/>
+        <property name="minIdle" value="4"/>
+        <property name="maxActive" value="32"/>
+        <!-- 超过时间限制是否回收 -->
+        <property name="removeAbandoned" value="true"/>
+        <!-- 超时时间；单位为秒。180秒=3分钟 -->
+        <property name="removeAbandonedTimeout" value="3000"/>
+        <!-- 配置获取连接等待超时的时间 -->
+        <property name="maxWait" value="60000"/>
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="60000"/>
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="300000"/>
+        <!-- 测试有效用的SQL Query -->
+        <property name="validationQuery" value="SELECT 'x'"/>
+        <!-- 连接空闲时测试是否有效 -->
+        <property name="testWhileIdle" value="true"/>
+        <!-- 获取连接时测试是否有效，这个为true时会活活慢死的，谨慎 -->
+        <property name="testOnBorrow" value="false"/>
+        <!-- 归还连接时是否测试有效 -->
+        <property name="testOnReturn" value="true"/>
+    </bean>
+
+    <!-- DAO接口所在包名，Spring会自动查找其下的类 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.bbs.dao"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+    </bean>
+
+    <!-- spring和MyBatis完美整合，不需要mybatis的配置映射文件 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="mysqlDataSource"/>
+        <!--<property name="configLocation" value="classpath:/orm/sqlMapConfig.xml" />-->
+        <property name="typeAliasesPackage" value="com.bbs.entity"/>
+        <!-- 自动扫描mapping.xml文件 -->
+        <property name="mapperLocations" value="classpath*:com/bbs/mapper/*.xml"></property>
+    </bean>
+
+    <!-- (事务管理)transaction manager, use JtaTransactionManager for global tx -->
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="mysqlDataSource"/>
+    </bean>
+
+    <!--    <aop:config>
+            <aop:pointcut id="transactionPointcut" expression="execution(* rml.service..*Impl.*(..))"/>
+            <aop:advisor pointcut-ref="transactionPointcut" advice-ref="transactionAdvice"/>
+        </aop:config>-->
+
+    <!-- quartz配置文件 start -->
+    <!-- 定义调用对象 -->
+    <!--    <bean id="quartzJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+            <property name="targetObject" ref="spiderTask"/>
+            <property name="targetMethod" value="startFake"/>
+        </bean>-->
+    <!-- 定义触发时间 -->
+    <!--    <bean id="myTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+            <property name="jobDetail" ref="quartzJob"/>
+            <property name="cronExpression" value="0 */10 * * * ?"/>
+        </bean>-->
+    <!-- 总管理类 -->
+    <!--    <bean id="scheduleJob" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+            <property name="triggers" ref="myTrigger"/>
+        </bean>-->
+    <!-- quartz配置文件 end -->
+
+</beans>

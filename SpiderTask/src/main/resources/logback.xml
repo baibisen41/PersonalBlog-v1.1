@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<!--<property name="LOGHOME" value="/data/dynamicDriverLogs/"/>-->
+	<property name="LOGHOME" value="D:/bbs-workspace-v2/PersonalBlogLogs-v2"/>
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{0} - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="FILEINFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOGHOME}/myblog-info.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- rollover daily -->
+			<fileNamePattern>${LOGHOME}/myblog-info.log.%d{yyyy-MM-dd}</fileNamePattern>
+			<maxHistory>100</maxHistory>
+		</rollingPolicy>
+		<Encoding>UTF-8</Encoding>
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{0} - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="FILEERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOGHOME}/myblog-err.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- rollover daily -->
+			<fileNamePattern>${LOGHOME}/myblog-err.log.%d{yyyy-MM-dd}</fileNamePattern>
+			<maxHistory>100</maxHistory>
+		</rollingPolicy>
+		<Encoding>UTF-8</Encoding>
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{0} - %msg%n</pattern>
+		</encoder>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>ERROR</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+	</appender>
+
+	<!-- logback为java中的包 -->
+	<root level="INFO">
+		<appender-ref ref="STDOUT"/>
+		<appender-ref ref="FILEINFO"/>
+		<appender-ref ref="FILEERROR" />
+	</root>
+
+</configuration>

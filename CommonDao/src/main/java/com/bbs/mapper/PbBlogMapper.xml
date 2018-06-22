@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bbs.dao.PbBlogDao">
+
+    <insert id="insertBlogDetail" parameterType="com.bbs.entity.Blog">
+        INSERT INTO blog_show_table (
+	    b_show_id,
+	    b_show_title,
+	    b_show_label,
+	    b_show_time,
+	    b_simple_content,
+	    b_full_content,
+	    b_send_flag,
+	    b_pic_url,
+	    b_show_ip,
+	    b_author_id,
+	    b_from_id)
+        VALUES
+	  (
+		#{blogId,jdbcType=VARCHAR},
+		#{blogTitle,jdbcType=VARCHAR},
+		#{blogLabel,jdbcType=VARCHAR},
+		#{blogTime,jdbcType=VARCHAR},
+		#{blogSimpleContent,jdbcType=VARCHAR},
+		#{blogContent,jdbcType=VARCHAR},
+		#{sendStatus,jdbcType=INTEGER},
+		#{blogPicUrl,jdbcType=VARCHAR},
+		#{ip,jdbcType=VARCHAR},
+		#{blogAuthorId,jdbcType=INTEGER},
+		#{blogFromId,jdbcType=INTEGER})
+    </insert>
+
+    <insert id="save" parameterType="com.bbs.entity.Blog">
+
+    </insert>
+
+    <insert id="saveList" parameterType="java.util.List">
+        INSERT INTO pb_blog(
+        id,
+        title,
+        tag,
+        thumb_pic,
+        summary,
+        content,
+        `type`,
+        `status`,
+        create_date
+        ) VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.title},
+            #{item.tag},
+            #{item.thumbPic},
+            #{item.summary},
+            #{item.content},
+            #{item.type},
+            #{item.status},
+            #{item.createDate}
+            )
+        </foreach>
+    </insert>
+
+    <select id="listBlogByType" parameterType="java.lang.Integer" resultType="com.bbs.entity.Blog">
+        SELECT
+        pb.id AS id,
+        pb.title AS title,
+        pb.tag AS tag,
+        pb.thumb_pic AS thumbPic,
+        pb.summary AS summary,
+        pb.type AS type,
+        pb.`status` AS status,
+        DATE_FORMAT(pb.create_date,'%Y-%m-%d') AS createDate,
+        ps.`name` AS userName,
+        pv.blog_pv AS blogPv
+        FROM
+        pb_blog pb
+        INNER JOIN pb_user ps ON pb.user_id = ps.id
+        INNER JOIN pb_blog_pv pv ON pb.id = pv.id
+        <if test="blogType != 0">
+            WHERE
+            pb.type = #{blogType}
+        </if>
+        ORDER BY
+        pb.create_date DESC
+        LIMIT #{pageNum},20
+    </select>
+
+    <select id="listTagCount" resultType="com.bbs.entity.Tag">
+        SELECT
+            b.tag AS label,
+            COUNT(*) AS count
+        FROM
+            pb_blog b
+        GROUP BY
+            b.tag
+    </select>
+
+    <select id="getBlogById" parameterType="String" resultType="com.bbs.entity.Blog">
+        SELECT
+            p.id AS id,
+            p.title AS title,
+            DATE_FORMAT(p.create_date,'%Y-%m-%d') AS createDate,
+            p.content AS content,
+            p.tag AS tag,
+            pu.name AS userName,
+            pv.blog_pv AS blogPv
+        FROM
+            pb_blog p
+        RIGHT JOIN pb_user pu ON p.user_id = pu.id
+        RIGHT JOIN pb_blog_pv pv ON pv.id = p.id
+        WHERE
+            p.id = #{id}
+    </select>
+
+    <select id="listBlogByCount" resultType="com.bbs.entity.Blog">
+        SELECT
+            pg.id AS id,
+            pg.title AS title,
+            pg.tag AS tag,
+            pg.thumb_pic AS thumbPic,
+            pg.create_date AS createDate,
+            pv.blog_pv AS blogPv
+        FROM
+            pb_blog pg
+        INNER JOIN pb_blog_pv pv ON pg.id = pv.id
+        ORDER BY
+            pv.blog_pv DESC
+        LIMIT 5
+    </select>
+
+    <update id="increaseBlogPv" parameterType="java.lang.String">
+        update pb_blog_pv
+        set blog_pv=blog_pv+1
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <select id="countBlogList" parameterType="Integer" resultType="Integer">
+        SELECT
+        COUNT(0)
+        FROM
+        pb_blog p
+        <if test="type!=0">
+            WHERE
+            p.type = #{type}
+        </if>
+    </select>
+
+    <select id="listHotBlog" resultType="com.bbs.entity.Blog">
+        SELECT
+            p.id AS id,
+            p.user_id AS userId,
+            p.title AS title,
+            p.tag AS tag,
+            p.thumb_pic AS thumbPic,
+            p.summary AS summary,
+            p.content AS content,
+            p.type AS type,
+            p.`status` AS `status`,
+            p.create_date AS createDate,
+            pv.blog_pv AS blogPv
+        FROM
+            pb_blog p
+        INNER JOIN pb_blog_pv pv ON p.id = pv.id
+        ORDER BY
+            pv.blog_pv DESC
+        LIMIT 5
+    </select>
+
+    <select id="listShortNews" resultType="com.bbs.entity.Blog">
+        SELECT
+            p.id AS id,
+            p.title AS title,
+            p.tag AS tag,
+            p.thumb_pic AS thumbPic,
+            p.summary AS summary,
+            p.content AS content,
+            p.create_date AS createDate
+        FROM
+            pb_news p
+        WHERE
+            DATE_FORMAT(p.create_date, '%Y%m%d') = DATE_FORMAT(CURRENT_TIMESTAMP, '%Y%m%d')
+        ORDER BY
+            p.create_date DESC
+        LIMIT 5
+    </select>
+
+    <select id="listRecommendBlog" resultType="com.bbs.entity.Blog">
+
+    </select>
+
+    <select id="listReplyBlog" resultType="com.bbs.entity.Blog">
+
+    </select>
+
+</mapper>
